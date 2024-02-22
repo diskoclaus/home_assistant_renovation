@@ -1,0 +1,350 @@
+
+sensor:
+
+  - platform: rest
+    name: 'Renovation Pap/papir'
+    resource: 'https://api.harders-it.dk/garbage/information/XXXXX/pappi_0?lang=da'
+    value_template: '{{ value_json.title }}'
+    scan_interval: 3600
+    json_attributes:
+    - name
+    - title
+    - address_long
+    - address_short
+    - service
+    - state
+    - next_date
+    - next_local
+    - next_local_short
+    - next_day_long
+    - next_day_short
+    - next_day_min
+    - next_in_days
+    - next_in_weeks
+    - next_in_months
+    - next_in_human
+    - next_is_today
+    - next_is_tomorrow
+    - next_is_this_week
+    - next_is_this_month
+  
+  - platform: rest
+    name: 'Renovation Rest/mad'
+    resource: 'https://api.harders-it.dk/garbage/information/XXXXX/restaffaldmadaffald_0?lang=da'
+    value_template: '{{ value_json.title }}'
+    scan_interval: 3600
+    json_attributes:
+    - name
+    - title
+    - address_long
+    - address_short
+    - service
+    - state
+    - next_date
+    - next_local
+    - next_local_short
+    - next_day_long
+    - next_day_short
+    - next_day_min
+    - next_in_days
+    - next_in_weeks
+    - next_in_months
+    - next_in_human
+    - next_is_today
+    - next_is_tomorrow
+    - next_is_this_week
+    - next_is_this_month
+    
+  - platform: rest
+    name: 'Renovation Farligt affald'
+    resource: https://api.harders-it.dk/garbage/information/XXXXX/farligtaffald_0?lang=da
+    value_template: '{{ value_json.title }}'
+    scan_interval: 3600
+    json_attributes:
+    - name
+    - title
+    - address_long
+    - address_short
+    - service
+    - state
+    - next_date
+    - next_local
+    - next_local_short
+    - next_day_long
+    - next_day_short
+    - next_day_min
+    - next_in_days
+    - next_in_weeks
+    - next_in_months
+    - next_in_human
+    - next_is_today
+    - next_is_tomorrow
+    - next_is_this_week
+    - next_is_this_month
+  
+  - platform: rest
+    name: 'Renovation Tekstiler'
+    resource: https://api.harders-it.dk/garbage/information/XXXXX/tekstiler_0?lang=da
+    value_template: '{{ value_json.title }}'
+    scan_interval: 3600
+    json_attributes:
+    - name
+    - title
+    - address_long
+    - address_short
+    - service
+    - state
+    - next_date
+    - next_local
+    - next_local_short
+    - next_day_long
+    - next_day_short
+    - next_day_min
+    - next_in_days
+    - next_in_weeks
+    - next_in_months
+    - next_in_human
+    - next_is_today
+    - next_is_tomorrow
+    - next_is_this_week
+    - next_is_this_month  
+    
+  - platform: rest
+    name: 'Renovation Glas/metal'
+    resource: 'https://api.harders-it.dk/garbage/information/XXXXX/metalglas_0?lang=da'
+    value_template: '{{ value_json.title }}'
+    scan_interval: 3600
+    json_attributes:
+    - name
+    - title
+    - address_long
+    - address_short
+    - service
+    - state
+    - next_date
+    - next_local
+    - next_local_short
+    - next_day_long
+    - next_day_short
+    - next_day_min
+    - next_in_days
+    - next_in_weeks
+    - next_in_months
+    - next_in_human
+    - next_is_today
+    - next_is_tomorrow
+    - next_is_this_week
+    - next_is_this_month  
+
+
+template:
+  - sensor:
+   
+    - name: dagsrenovation
+      state: >
+        {% set list = (
+          {
+            'title': 'glas og metal',
+            'next_in_days': state_attr('sensor.renovation_glas_metal', 'next_in_days'),
+            'next_is_today': state_attr('sensor.renovation_glas_metal', 'next_is_today'),
+            'next_is_tomorrow': state_attr('sensor.renovation_glas_metal', 'next_is_tomorrow'),
+            'date': states('sensor.renovation_glas_metal'),
+          },
+          {
+            'title': 'farligt affald',
+            'next_in_days': state_attr('sensor.renovation_farligt_affald', 'next_in_days'),
+            'next_is_today': state_attr('sensor.renovation_farligt_affald', 'next_is_today'),
+            'next_is_tomorrow': state_attr('sensor.renovation_farligt_affald', 'next_is_tomorrow'),
+            'date': states('sensor.renovation_farligt_affald'),
+          },
+          {
+            'title': 'tekstiler',
+            'next_in_days': state_attr('sensor.renovation_tekstiler', 'next_in_days'),
+            'next_is_today': state_attr('sensor.renovation_tekstiler', 'next_is_today'),
+            'next_is_tomorrow': state_attr('sensor.renovation_tekstiler', 'next_is_tomorrow'),
+            'date': states('sensor.renovation_tekstiler'),
+          },
+
+          {
+            'title': 'pap og papir',
+            'next_in_days': state_attr('sensor.renovation_pap_papir', 'next_in_days'),
+            'next_is_today': state_attr('sensor.renovation_pap_papir', 'next_is_today'),
+            'next_is_tomorrow': state_attr('sensor.renovation_pap_papir', 'next_is_tomorrow'),
+            'date': states('sensor.renovation_pap_papir'),
+          },
+          {
+            'title': 'rest og mad',
+            'next_in_days': state_attr('sensor.renovation_rest_mad', 'next_in_days'),
+            'next_is_today': state_attr('sensor.renovation_rest_mad', 'next_is_today'),
+            'next_is_tomorrow': state_attr('sensor.renovation_rest_mad', 'next_is_tomorrow'),
+            'date': states('sensor.renovation_rest_mad'),
+          }
+        ) %} 
+        {{ (list|sort(attribute='next_in_days')|first)['date'] }}
+      attributes:
+        tekst: >
+          {% set list = (
+            {
+              'title': 'glas og metal',
+              'next_in_days': state_attr('sensor.renovation_glas_metal', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_glas_metal', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_glas_metal', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_glas_metal'),
+            },
+            {
+              'title': 'farligt affald',
+              'next_in_days': state_attr('sensor.renovation_farligt_affald', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_farligt_affald', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_farligt_affald', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_farligt_affald'),
+            },            
+            {
+              'title': 'pap og papir',
+              'next_in_days': state_attr('sensor.renovation_pap_papir', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_pap_papir', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_pap_papir', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_pap_papir'),
+            },
+            {
+              'title': 'rest og mad',
+              'next_in_days': state_attr('sensor.renovation_rest_mad', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_rest_mad', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_rest_mad', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_rest_mad'),
+            }
+          ) %}
+          {{ (list|sort(attribute='next_in_days')|first)['title'] }}
+        next_in_days: >
+          {% set list = (
+            {
+              'title': 'glas og metal',
+              'next_in_days': state_attr('sensor.renovation_glas_metal', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_glas_metal', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_glas_metal', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_glas_metal'),
+            },
+            {
+              'title': 'farligt affald',
+              'next_in_days': state_attr('sensor.renovation_farligt_affald', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_farligt_affald', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_farligt_affald', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_farligt_affald'),
+            },                  
+            {
+              'title': 'tekstiler',
+              'next_in_days': state_attr('sensor.renovation_tekstiler', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_tekstiler', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_tekstiler', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_tekstiler'),
+            },
+            {
+              'title': 'pap og papir',
+              'next_in_days': state_attr('sensor.renovation_pap_papir', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_pap_papir', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_pap_papir', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_pap_papir'),
+            },
+            {
+              'title': 'rest og mad',
+              'next_in_days': state_attr('sensor.renovation_rest_mad', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_rest_mad', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_rest_mad', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_rest_mad'),
+            }
+          ) %}        
+          {{ (list|sort(attribute='next_in_days')|first)['next_in_days'] }}
+        next_is_today: >
+          {% set list = (
+            {
+              'title': 'glas og metal',
+              'next_in_days': state_attr('sensor.renovation_glas_metal', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_glas_metal', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_glas_metal', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_glas_metal'),
+            },
+            {
+              'title': 'farligt affald',
+              'next_in_days': state_attr('sensor.renovation_farligt_affald', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_farligt_affald', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_farligt_affald', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_farligt_affald'),
+            },   
+            {
+              'title': 'tekstiler',
+              'next_in_days': state_attr('sensor.renovation_tekstiler', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_tekstiler', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_tekstiler', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_tekstiler'),
+            },
+            {
+              'title': 'pap og papir',
+              'next_in_days': state_attr('sensor.renovation_pap_papir', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_pap_papir', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_pap_papir', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_pap_papir'),
+            },
+            {
+              'title': 'rest og mad',
+              'next_in_days': state_attr('sensor.renovation_rest_mad', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_rest_mad', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_rest_mad', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_rest_mad'),
+            }
+          ) %}        
+          {{ (list|sort(attribute='next_in_days')|first)['next_is_today'] }}
+        next_is_tomorrow: >
+          {% set list = (
+            {
+              'title': 'glas og metal',
+              'next_in_days': state_attr('sensor.renovation_glas_metal', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_glas_metal', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_glas_metal', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_glas_metal'),
+            },
+            {
+              'title': 'farligt affald',
+              'next_in_days': state_attr('sensor.renovation_farligt_affald', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_farligt_affald', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_farligt_affald', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_farligt_affald'),
+            },       
+            {
+              'title': 'tekstiler',
+              'next_in_days': state_attr('sensor.renovation_tekstiler', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_tekstiler', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_tekstiler', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_tekstiler'),
+            },
+              
+            {
+              'title': 'pap og papir',
+              'next_in_days': state_attr('sensor.renovation_pap_papir', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_pap_papir', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_pap_papir', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_pap_papir'),
+            },
+            {
+              'title': 'rest og mad',
+              'next_in_days': state_attr('sensor.renovation_rest_mad', 'next_in_days'),
+              'next_is_today': state_attr('sensor.renovation_rest_mad', 'next_is_today'),
+              'next_is_tomorrow': state_attr('sensor.renovation_rest_mad', 'next_is_tomorrow'),
+              'date': states('sensor.renovation_rest_mad'),
+            }
+          ) %}        
+          {{ (list|sort(attribute='next_in_days')|first)['next_is_tomorrow'] }}
+
+        fremtidig_afhentning: >
+          {% set ns = namespace(renovation = []) %}
+          {% for state in states if state.entity_id.startswith("sensor.renovation_") -%}
+          {% set next_in_days = state_attr(state.entity_id, 'next_in_days') %}
+          {% set title = state_attr(state.entity_id, 'title') %}
+          {% set next_local = state_attr(state.entity_id, 'next_in_days') %}
+
+          {% if 'None' in states(state.entity_id) %}
+            {% set next_in_days = 999 %}
+          {% endif %}
+
+          {% set ns.renovation = ns.renovation + [{'name': (state.name | replace("Renovation ", "") | string), 'title': title | string, 'next_in_days': next_in_days }] %}         
+
+          {%- endfor -%}
+          {{ns.renovation | sort(attribute='next_in_days')}}
